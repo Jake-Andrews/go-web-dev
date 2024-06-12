@@ -1,12 +1,14 @@
 package main
 
 import (
+	//"embed"
 	"log"
 	"log/slog"
 	"net/http"
 	"os"
 
-    "github.com/Jake-Andrews/go-web-dev/handler"
+	"github.com/Jake-Andrews/go-web-dev/handler"
+	"github.com/Jake-Andrews/go-web-dev/pkg/supabase"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 )
@@ -16,17 +18,18 @@ func main() {
 		log.Fatal(err)
 	}
 	router := chi.NewMux()
-    router.Get("/", handler.MakeHandler(handler.HandleHomeIndex))
+	router.Handle("/*", Publicfs())
+	router.Get("/", handler.MakeHandler(handler.HandleHomeIndex))
+	router.Get("/signin", handler.MakeHandler(handler.HandleSigninIndex))
 
-    port := os.Getenv("LISTEN_ADDR")
+	port := os.Getenv("LISTEN_ADDR")
 	slog.Info("Running on: ", "port", port)
-	err := http.ListenAndServe(port, router)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	log.Fatal(http.ListenAndServe(port, router))
 }
 
 func initEverything() error {
-	return godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		return err
+	}
+	return supabase.Init()
 }

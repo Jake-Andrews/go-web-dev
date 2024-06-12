@@ -24,3 +24,4 @@ go.work
 *_templ.go*
 bin
 node_modules
+tmp
